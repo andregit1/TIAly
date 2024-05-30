@@ -1,0 +1,54 @@
+version: '3.8'
+services:
+  db:
+    image: postgres:14.11
+    container_name: db
+    restart: always
+    # environment:
+    #   POSTGRES_USER: root
+    #   POSTGRES_PASSWORD: 123123123
+    #   POSTGRES_DB: tialy_dev
+    env_file:
+      - .env
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    ports:
+      - '5432:5432'
+    expose:
+      - '5432'
+  redis:
+    container_name: redis
+    image: redis:7.2.4
+    command: redis-server
+    volumes:
+      - redis_data:/data
+    ports:
+      - '6379:6379'
+    depends_on:
+      db:
+        condition: service_started
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: app
+    restart: always
+    depends_on:
+      db:
+        condition: service_started
+      redis:
+        condition: service_started
+    ports:
+      - '3000:3000'
+    env_file:
+      - .env
+    volumes:
+      - .:/app
+      - /app/node_modules
+volumes:
+  db_data:
+    driver: local
+  redis_data:
+    driver: local
+  # node_modules:
+  #   driver: local
