@@ -1,5 +1,6 @@
 // src/controllers/authController.js
-const { User } = require('../models');
+const db = require('../../models');
+const { User } = db;
 const bcrypt = require('bcryptjs');
 
 exports.signup = async (req, res) => {

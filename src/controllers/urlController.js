@@ -1,5 +1,6 @@
 // src/controllers/urlController.js
-const { Url, UrlAccessLog } = require('../models');
+const db = require('../../models');
+const { Url, UrlAccessLog } = db;
 
 exports.redirect = async (req, res) => {
   const { slug } = req.params;
@@ -12,6 +13,9 @@ exports.redirect = async (req, res) => {
         ipAddress: req.ip,
         userAgent: req.headers['user-agent']
       });
+
+      // Increment clickCount field
+      await url.increment('clickCount');
 
       res.redirect(301, url.originalUrl);
     } else {

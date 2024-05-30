@@ -1,13 +1,4 @@
 // src/middleware/logging.js
-// module.exports = (req, res, next) => {
-//   const ipAddress = req.ip;
-//   const userAgent = req.headers['user-agent'];
-//   console.log(`Request from IP: ${ipAddress}, User-Agent: ${userAgent}`);
-//   next();
-// };
-
-
-// src/middleware/logging.js
 const fs = require('fs');
 const path = require('path');
 

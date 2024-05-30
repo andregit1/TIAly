@@ -1,5 +1,6 @@
 // src/controllers/adminController.js
-const { Url } = require('../models/url');
+const db = require('../../models');
+const { Url } = db;
 const generateSlug = require('../utils/generateSlug');
 
 exports.listUrls = async (req, res) => {

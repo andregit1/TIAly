@@ -1,6 +1,6 @@
 // src/utils/generateSlug.js
 const { nanoid } = require('nanoid');
-const { Url } = require('../models/Url');
+const { Url } = require('../../models/Url');
 
 const generateSlug = async () => {
     let slug;
