@@ -1,5 +1,5 @@
 // src/controllers/urlController.js
-const db = require('../../models');
+const db = require('../models');
 const { Url, UrlAccessLog } = db;
 
 exports.redirect = async (req, res) => {
@@ -24,4 +24,21 @@ exports.redirect = async (req, res) => {
   } catch (err) {
     res.status(500).send(err);
   }
+};
+
+exports.createUrl = async (req, res) => {
+	try {
+		const { slug, originalUrl } = req.body;
+		let finalSlug = slug;
+
+		// Generate a unique slug if not provided
+		if (!finalSlug) {
+			finalSlug = await generateSlug();
+		}
+
+		const url = await Url.create({ slug: finalSlug, originalUrl });
+		res.json(url);
+	} catch (err) {
+			res.status(500).send('Server Error');
+	}
 };
