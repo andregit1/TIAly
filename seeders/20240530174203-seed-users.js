@@ -10,14 +10,16 @@ module.exports = {
     );
 
     const adminRoleId = roles[0][0].id;
-    await queryInterface.bulkInsert('Users', [{
+    await queryInterface.bulkInsert('users', [{
       username: 'root',
       password: hashedPassword,
       roleId: adminRoleId,
+      createdAt: new Date(),
+      updatedAt: new Date(),
     }], {});
   },
 
   async down (queryInterface, Sequelize) {
-    await queryInterface.bulkDelete('Users', null, {});
+    await queryInterface.bulkDelete('users', null, {});
   }
 };
