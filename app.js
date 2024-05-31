@@ -1,15 +1,18 @@
-// src/app.js
 const express = require('express');
 const bodyParser = require('body-parser');
 const session = require('express-session');
 const RedisStore = require('connect-redis')(session);
 const redis = require('redis');
-const db = require('../models/index');
-const passport = require('../src/middleware/auth');
-const loggingMiddleware = require('../src/middleware/logging');
-const adminRoutes = require('../src/routes/adminRoutes');
-const authRoutes = require('../src/routes/authRoutes');
-const urlRoutes = require('../src/routes/urlRoutes');
+const db = require('./models/index');
+const passport = require('./middleware/auth');
+const loggingMiddleware = require('./middleware/logging');
+const adminRoutes = require('./routes/adminRoutes');
+const authRoutes = require('./routes/authRoutes');
+const urlRoutes = require('./routes/urlRoutes');
+
+// Import Swagger packages
+const swaggerJsdoc = require('swagger-jsdoc');
+const swaggerUi = require('swagger-ui-express');
 
 const app = express();
 const client = redis.createClient({ url: process.env.REDIS_URL });
@@ -32,6 +35,21 @@ app.use(loggingMiddleware); // Apply logging middleware
 app.use('/admin', adminRoutes);
 app.use('/auth', authRoutes);
 app.use('/', urlRoutes);
+
+// Swagger setup
+const swaggerOptions = {
+  swaggerDefinition: {
+    info: {
+      title: 'Your API Title',
+      description: 'Your API Description',
+      version: '1.0.0',
+    },
+  },
+  apis: ['./routes/*.js'], // Path to the API routes
+};
+
+const swaggerDocs = swaggerJsdoc(swaggerOptions);
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs));
 
 // Sync database and start server
 db.sequelize.sync({ force: false })
