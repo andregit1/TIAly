@@ -24,7 +24,7 @@ module.exports = {
         defaultValue: 0
       },
       isCustom: {
-        type: DataTypes.BOOLEAN,
+        type: Sequelize.BOOLEAN,
         defaultValue: false
       },
       createdAt: {
