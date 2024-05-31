@@ -23,11 +23,11 @@ const app = express();
 const redis = new Redis(process.env.REDIS_URL);
 
 redis.on('connect', function () {
-  console.log('Redis client connected');
+  console.log('\nRedis client connected');
 });
 
 redis.on('error', function (err) {
-  console.error('Redis error:', err);
+  console.error('\nRedis error:', err);
 });
 
 app.use(bodyParser.json());

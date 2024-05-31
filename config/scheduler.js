@@ -2,8 +2,9 @@ const cron = require('node-cron');
 const syncClickCounts = require('../utils/syncClickCounts');
 
 cron.schedule('0 * * * *', () => {
-  console.log('Running syncClickCounts job...');
+  console.log('\nRunning syncClickCounts job...');
   syncClickCounts();
+  console.log('\nsyncClickCounts job finished.'); 
 });
 
-console.log('Scheduler initialized');
+console.log('\nScheduler initialized');
