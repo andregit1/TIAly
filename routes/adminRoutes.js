@@ -88,7 +88,17 @@ router.post('/urls', adminController.createUrl);
  *       content:
  *         application/json:
  *           schema:
- *             $ref: '#/components/schemas/Url'
+ *             type: object
+ *             properties:
+ *               slug:
+ *                 type: string
+ *                 nullable: true
+ *                 example: null
+ *                 description: The custom slug for the URL (optional)
+ *               originalUrl:
+ *                 type: string
+ *                 format: uri
+ *                 description: The original URL to be shortened
  *     responses:
  *       '200':
  *         description: URL updated successfully

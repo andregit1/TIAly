@@ -1,7 +1,7 @@
 const redis = require('../config/ioredis');
 const db = require('../models');
 const { Url, UrlAccessLog } = db;
-const generateSlug = require('../utils/generateSlug');
+const { createShortenedUrl } = require('../services/url/create')
 const CACHE_EXPIRATION = process.env.REDIS_CACHE_EXPIRATION || 3600; // Default to 3600 if not set
 
 exports.redirect = async (req, res) => {
@@ -39,22 +39,5 @@ exports.redirect = async (req, res) => {
 };
 
 exports.createUrl = async (req, res) => {
-  try {
-    const { slug, originalUrl } = req.body;
-    let finalSlug = slug;
-
-    // Generate a unique slug if not provided
-    if (!finalSlug) {
-      finalSlug = await generateSlug();
-    }
-
-    const url = await Url.create({ slug: finalSlug, originalUrl });
-
-    // Store in cache
-    await redis.set(`url:${finalSlug}`, JSON.stringify(url), 'EX', 3600); // Cache for 1 hour
-
-    res.json(url);
-  } catch (err) {
-    res.status(500).send('Server Error');
-  }
+  await createShortenedUrl(req, res)
 };

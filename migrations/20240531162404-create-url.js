@@ -9,6 +9,9 @@ module.exports = {
         primaryKey: true,
         type: Sequelize.INTEGER
       },
+      domain: {
+        type: Sequelize.STRING,
+      },
       slug: {
         type: Sequelize.STRING,
         unique: true
@@ -19,6 +22,10 @@ module.exports = {
       clickCount: {
         type: Sequelize.INTEGER,
         defaultValue: 0
+      },
+      isCustom: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: false
       },
       createdAt: {
         allowNull: false,

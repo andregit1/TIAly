@@ -15,12 +15,17 @@ module.exports = (sequelize, DataTypes) => {
     }
   }
   Url.init({
+    domain: DataTypes.STRING, 
     slug: DataTypes.STRING,
     originalUrl: DataTypes.TEXT,
     clickCount: {
       type: DataTypes.INTEGER,
       defaultValue: 0
     },
+    isCustom: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false
+    }
   }, {
     sequelize,
     modelName: 'Url',
