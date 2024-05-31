@@ -1,11 +1,15 @@
+require('dotenv').config(); // Initialize dotenv
+require('./config/scheduler'); // Initialize scheduler
+
 const express = require('express');
 const bodyParser = require('body-parser');
 const session = require('express-session');
+const Redis = require('ioredis');
 const RedisStore = require('connect-redis').default;
-const redis = require('redis');
 const db = require('./models/index');
 const passport = require('./middleware/auth');
 const loggingMiddleware = require('./middleware/logging');
+const cors = require('cors');
 const adminRoutes = require('./routes/adminRoutes');
 const authRoutes = require('./routes/authRoutes');
 const urlRoutes = require('./routes/urlRoutes');
@@ -14,17 +18,23 @@ const urlRoutes = require('./routes/urlRoutes');
 const swaggerJsdoc = require('swagger-jsdoc');
 const swaggerUi = require('swagger-ui-express');
 
+// Initialize
 const app = express();
-const client = redis.createClient({ url: process.env.REDIS_URL });
+const redis = new Redis(process.env.REDIS_URL);
 
-require('./config/scheduler'); // Initialize scheduler
-require('dotenv').config(); // Initialize dotenv
+redis.on('connect', function () {
+  console.log('Redis client connected');
+});
+
+redis.on('error', function (err) {
+  console.error('Redis error:', err);
+});
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
 app.use(session({
-  store: new RedisStore({ client }),
+  store: new RedisStore({ client: redis }),
   secret: process.env.SESSION_SECRET,
   resave: false,
   saveUninitialized: false
@@ -33,6 +43,7 @@ app.use(session({
 app.use(passport.initialize());
 app.use(passport.session());
 // app.use(loggingMiddleware); // Apply logging middleware
+app.use(cors()); // Use cors middleware
 
 // Swagger setup
 const swaggerOptions = {
