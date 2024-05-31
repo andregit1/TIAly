@@ -11,6 +11,12 @@ const development = {
   },
 };
 
+const test = {
+  dialect: 'sqlite',
+  storage: ':memory:', // Use in-memory database for testing
+};
+
 module.exports = {
-  development
-}
+  development,
+  test,
+};
