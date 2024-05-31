@@ -21,7 +21,16 @@ const passport = require('../middleware/auth');
  *       content:
  *         application/json:
  *           schema:
- *             $ref: '#/components/schemas/UserSignup'
+ *             type: object
+ *             properties:
+ *               username:
+ *                 type: string
+ *               password:
+ *                 type: string
+ *               roleId:
+ *                 type: integer
+ *                 example: null
+ *                 default: null
  *     responses:
  *       '201':
  *         description: User registered successfully
@@ -41,7 +50,12 @@ router.post('/signup', authController.signup);
  *       content:
  *         application/json:
  *           schema:
- *             $ref: '#/components/schemas/UserSignin'
+ *             type: object
+ *             properties:
+ *               username:
+ *                 type: string
+ *               password:
+ *                 type: string
  *     responses:
  *       '200':
  *         description: User signed in successfully

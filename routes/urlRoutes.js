@@ -32,22 +32,33 @@ router.get('/:slug', urlController.redirect);
 
 /**
  * @swagger
- * /urls:
+ * /urls/create:
  *   post:
  *     summary: Create a new URL
- *     tags: [URL]
+ *     tags:
+ *       - URL
  *     requestBody:
  *       required: true
  *       content:
  *         application/json:
  *           schema:
- *             $ref: '#/components/schemas/Url'
+ *             type: object
+ *             properties:
+ *               slug:
+ *                 type: string
+ *                 nullable: true
+ *                 example: null
+ *                 description: The custom slug for the URL (optional)
+ *               originalUrl:
+ *                 type: string
+ *                 format: uri
+ *                 description: The original URL to be shortened
  *     responses:
  *       '201':
  *         description: URL created successfully
  *       '400':
  *         description: Bad request
  */
-router.post('/', urlController.createUrl);
+router.post('/urls/create', urlController.createUrl);
 
 module.exports = router;

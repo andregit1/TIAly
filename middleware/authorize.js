@@ -1,14 +1,23 @@
 const authorize = (requiredRole) => {
-  return (req, res, next) => {
-    if (!req.isAuthenticated()) {
-      return res.status(401).json({ message: 'Unauthorized' });
-    }
+  return async (req, res, next) => {
+    try {
+      if (!req.isAuthenticated()) {
+        return res.status(401).json({ message: 'Unauthorized' });
+      }
 
-    if (req.user.role.name !== requiredRole) {
-      return res.status(403).json({ message: 'Forbidden' });
-    }
+      // Fetch the user data with the associated role
+      const user = await req.user.reload({ include: 'role' });
 
-    next();
+      // Check if the user has the required role
+      if (!user.role || user.role.name !== requiredRole) {
+        return res.status(403).json({ message: 'Forbidden' });
+      }      
+
+      next();
+    } catch (error) {
+      console.error('Authorization error:', error);
+      return res.status(500).json({ message: 'Internal server error' });
+    }
   };
 };
 
