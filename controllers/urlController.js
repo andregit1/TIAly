@@ -1,4 +1,3 @@
-// src/controllers/urlController.js
 const db = require('../models');
 const { Url, UrlAccessLog } = db;
 

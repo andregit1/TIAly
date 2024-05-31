@@ -1,4 +1,3 @@
-// src/middleware/authorize.js
 const authorize = (requiredRole) => {
   return (req, res, next) => {
     if (!req.isAuthenticated()) {

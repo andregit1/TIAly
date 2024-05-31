@@ -1,4 +1,3 @@
-// src/middleware/logging.js
 const fs = require('fs');
 const path = require('path');
 

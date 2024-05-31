@@ -1,4 +1,3 @@
-// src/utils/generateSlug.js
 const bcrypt = require('bcryptjs');
 const db = require('../models');
 const { Url } = db;

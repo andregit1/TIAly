@@ -1,4 +1,3 @@
-// src/controllers/adminController.js
 const db = require('../models');
 const { Url } = db;
 const generateSlug = require('../utils/generateSlug');
