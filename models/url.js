@@ -17,7 +17,10 @@ module.exports = (sequelize, DataTypes) => {
   Url.init({
     slug: DataTypes.STRING,
     originalUrl: DataTypes.TEXT,
-    clickCount: DataTypes.INTEGER
+    clickCount: {
+      type: DataTypes.INTEGER,
+      defaultValue: 0
+    },
   }, {
     sequelize,
     modelName: 'Url',
