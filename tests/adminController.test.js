@@ -1,48 +1,66 @@
 const request = require('supertest');
-const app = require('./server'); // Import your Express app
-const { sequelize, UserTest, RoleTest, UrlTest } = require('./helper'); // Import necessary models from your helper file
-const bcrypt = require('bcryptjs'); // Import bcrypt for password hashing
+const app = require('./server');
+const { sequelize, UserTest, RoleTest, UrlTest } = require('./helper');
+const bcrypt = require('bcryptjs');
 
 // Mock auth token
-const authToken = 'mockedAuthToken';
+let authToken;
+
+// Mock passport module
+jest.mock('passport', () => ({
+    use: jest.fn(),
+    authenticate: jest.fn(),
+    serializeUser: jest.fn(),
+    deserializeUser: jest.fn(),
+    isAuthenticated: jest.fn((req, res, next) => {
+        if (req.isAuthenticated()) {
+            return next();
+        } else {
+            res.status(401).json({ message: 'Unauthorized' });
+        }
+    })
+}));
 
 // Import expect from Jest
 const { expect } = require('@jest/globals');
 
 describe('Admin Controller', () => {
-  beforeAll(async () => {
-    await sequelize.sync({ force: true }); // Sync models to create the tables
-    await UrlTest.bulkCreate([ // Use UrlTest model instead of Url
-      { originalUrl: 'https://example.com/page1' },
-      { originalUrl: 'https://example.com/page2' },
-      { originalUrl: 'https://example.com/page3' },
-    ]);
+    beforeAll(async () => {
+        await sequelize.sync({ force: true }); // Sync models to create the tables
+        await UrlTest.bulkCreate([
+            { originalUrl: 'https://example.com/page1' },
+            { originalUrl: 'https://example.com/page2' },
+            { originalUrl: 'https://example.com/page3' },
+        ]);
 
-    // Create a test user for authentication
-    await UserTest.create({ username: 'testuser', password: 'testpassword' });
-    const hashedPassword = await bcrypt.hash('testpassword', 10); // Hash the password
-    await UserTest.create({ username: 'testuser', password: hashedPassword }); // Use UserTest model instead of User
+        // Create a test user for authentication
+        await UserTest.create({ username: 'testuser', password: 'testpassword' });
+        const hashedPassword = await bcrypt.hash('testpassword', 10); // Hash the password
+        await UserTest.create({ username: 'testuser', password: hashedPassword }); // Use UserTest model instead of User
 
-    const res = await request(app)
-      .post('/auth/signin')
-      .send({ username: 'testuser', password: 'testpassword' });
-  });
-
-  afterAll(async () => {
-    await UrlTest.destroy({ where: {} });
-    await sequelize.close(); // Close the database connection after all tests
-  });
-
-  describe('GET /admin/urls', () => {
-    it('should return a list of URLs', async () => {
-      const res = await request(app)
-        .get('/admin/urls')
-        .set('Cookie', ['user_id=1']); // Mock session cookie with user ID
-      expect(res.status).toBe(200);
-      expect(Array.isArray(res.body)).toBe(true);
-      expect(res.body.length).toBeGreaterThanOrEqual(3);
+        const res = await request(app)
+            .post('/auth/signin')
+            .send({ username: 'testuser', password: 'testpassword' });
+        
+        authToken = res.body.token; // Store the auth token
     });
-  });
+
+    afterAll(async () => {
+        await UrlTest.destroy({ where: {} });
+        await sequelize.close(); // Close the database connection after all tests
+    });
+
+    describe('GET /admin/urls', () => {
+        it('should return a list of URLs', async () => {
+            const res = await request(app)
+                .get('/admin/urls')
+                .set('Cookie', ['user_id=1']) // Mock session cookie with user ID
+                .set('Authorization', `Bearer ${authToken}`); // Include authentication token
+            expect(res.status).toBe(200);
+            expect(Array.isArray(res.body)).toBe(true);
+            expect(res.body.length).toBeGreaterThanOrEqual(3);
+        });
+    });
 
   describe('GET /admin/urls/:id', () => {
     it('should return a single URL by ID', async () => {
