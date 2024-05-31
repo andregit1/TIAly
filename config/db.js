@@ -1,4 +1,3 @@
-require('dotenv').config(); // Load environment variables from .env file
 const process = require('process');
 
 const development = {

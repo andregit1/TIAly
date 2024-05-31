@@ -17,6 +17,9 @@ const swaggerUi = require('swagger-ui-express');
 const app = express();
 const client = redis.createClient({ url: process.env.REDIS_URL });
 
+require('./config/scheduler'); // Initialize scheduler
+require('dotenv').config(); // Initialize dotenv
+
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
