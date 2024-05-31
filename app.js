@@ -29,27 +29,33 @@ app.use(session({
 
 app.use(passport.initialize());
 app.use(passport.session());
-app.use(loggingMiddleware); // Apply logging middleware
-
-// Routes
-app.use('/admin', adminRoutes);
-app.use('/auth', authRoutes);
-app.use('/', urlRoutes);
+// app.use(loggingMiddleware); // Apply logging middleware
 
 // Swagger setup
 const swaggerOptions = {
-  swaggerDefinition: {
+  definition: {
+    openapi: '3.0.0',
     info: {
-      title: 'Your API Title',
-      description: 'Your API Description',
+      title: 'TIAly',
       version: '1.0.0',
+      description: 'URL shortener',
     },
+    servers: [
+      {
+        url: 'http://localhost:3000',
+      },
+    ],
   },
   apis: ['./routes/*.js'], // Path to the API routes
 };
 
 const swaggerDocs = swaggerJsdoc(swaggerOptions);
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs));
+
+// Routes
+app.use('/admin', adminRoutes);
+app.use('/auth', authRoutes);
+app.use('/', urlRoutes);
 
 // Sync database and start server
 db.sequelize.sync({ force: false, logging: (msg) => console.log(`${msg}\n`) })
