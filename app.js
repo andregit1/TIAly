@@ -52,7 +52,7 @@ const swaggerDocs = swaggerJsdoc(swaggerOptions);
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs));
 
 // Sync database and start server
-db.sequelize.sync({ force: false })
+db.sequelize.sync({ force: false, logging: (msg) => console.log(`${msg}\n`) })
   .then(() => {
     console.log('Database synchronized');
     const PORT = process.env.PORT || 3000;
