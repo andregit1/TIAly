@@ -41,3 +41,14 @@ exports.redirect = async (req, res) => {
 exports.createUrl = async (req, res) => {
   await createShortenedUrl(req, res)
 };
+
+exports.getClickCount = async (req, res) => {
+  const { slug } = req.body;
+  try {
+    const clickCount = await redis.get(`url:${slug}:clickCount`);
+
+    res.status(200).json({ clickCount });
+  } catch (err) {
+    res.status(500).send(err);
+  }
+};

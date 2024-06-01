@@ -11,7 +11,7 @@ const urlController = require('../controllers/urlController');
 
 /**
  * @swagger
- * /urls/{slug}:
+ * /{slug}:
  *   get:
  *     summary: Redirect to the original URL associated with the provided slug
  *     tags: [URL]
@@ -60,5 +60,38 @@ router.get('/:slug', urlController.redirect);
  *         description: Bad request
  */
 router.post('/urls/create', urlController.createUrl);
+
+/**
+ * @swagger
+ * /track-clicks:
+ *   post:
+ *     summary: Get click count for a specific URL slug
+ *     tags: [URL]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               slug:
+ *                 type: string
+ *                 description: The slug associated with the URL
+ *     responses:
+ *       '200':
+ *         description: Successfully retrieved click count
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 clickCount:
+ *                   type: number
+ *                   description: The current click count for the URL
+ *       '500':
+ *         description: Internal server error
+ */
+
+router.post('/track-clicks', urlController.getClickCount);
 
 module.exports = router;
