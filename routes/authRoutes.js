@@ -62,7 +62,7 @@ router.post('/signup', authController.signup);
  *       '401':
  *         description: Unauthorized
  */
-router.post('/signin', passport.authenticate('local'), authController.signin);
+router.post('/signin', authController.signin);
 
 /**
  * @swagger

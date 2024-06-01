@@ -1,6 +1,7 @@
 const db = require('../models');
 const { User, Role } = db;
 const bcrypt = require('bcryptjs');
+const passport = require('../middleware/auth');
 
 exports.signup = async (req, res) => {
 	const { username, password, roleId } = req.body;
@@ -18,8 +19,22 @@ exports.signup = async (req, res) => {
 	}
 };
 
-exports.signin = (req, res) => {
-    res.status(200).json({ message: 'Signed in successfully', user: req.user });
+exports.signin = (req, res, next) => {
+	passport.authenticate('local', (err, user, info) => {
+			if (err) {
+					return next(err);
+			}
+			if (!user) {
+					return res.status(401).json({ message: 'Unauthorized' });
+			}
+			
+			req.login(user, (err) => {
+					if (err) {
+							return next(err);
+					}
+					return res.status(200).json({ message: 'Signed in successfully', user: user });
+			});
+	})(req, res, next);
 };
 
 exports.signout = (req, res, next) => {
