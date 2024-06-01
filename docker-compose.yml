@@ -4,12 +4,10 @@ services:
     image: postgres:14.11
     container_name: db
     restart: always
-    # environment:
-    #   POSTGRES_USER: root
-    #   POSTGRES_PASSWORD: 123123123
-    #   POSTGRES_DB: tialy_dev
-    env_file:
-      - .env
+    environment:
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: 123123123
+      POSTGRES_DB: tialy_dev
     volumes:
       - db_data:/var/lib/postgresql/data
     ports:
@@ -25,8 +23,7 @@ services:
     ports:
       - '6379:6379'
     depends_on:
-      db:
-        condition: service_started
+      - db
   app:
     build:
       context: .
@@ -34,10 +31,8 @@ services:
     container_name: app
     restart: always
     depends_on:
-      db:
-        condition: service_started
-      redis:
-        condition: service_started
+      - db
+      - redis
     ports:
       - '3000:3000'
     env_file:
@@ -50,5 +45,3 @@ volumes:
     driver: local
   redis_data:
     driver: local
-  # node_modules:
-  #   driver: local
