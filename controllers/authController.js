@@ -8,6 +8,18 @@ exports.signup = async (req, res) => {
 	let role = roleId ? await Role.findOne({ where: { id: roleId } }) : null;
 	
 	try {
+		// Check if username is already taken
+		const existingUser = await User.findOne({ where: { username } });
+		if (existingUser) {
+				return res.status(400).json({ message: 'Username is already taken' });
+		}
+
+		let role = roleId ? await Role.findOne({ where: { id: roleId } }) : null;
+
+		if (roleId && !role) {
+				return res.status(400).json({ message: 'Bad request' });
+		}
+
 		const hashedPassword = await bcrypt.hash(password, 10);
 		const user = await User.create({ username, password: hashedPassword, roleId: role ? roleId : null });
 
@@ -20,6 +32,13 @@ exports.signup = async (req, res) => {
 };
 
 exports.signin = (req, res, next) => {
+	const { username, password } = req.body;
+
+	// Check if username or password is missing or blank
+	if (!username || !password || username.trim() === '' || password.trim() === '') {
+			return res.status(400).json({ message: 'Username and password are required' });
+	}
+	
 	passport.authenticate('local', (err, user, info) => {
 			if (err) {
 					return next(err);
