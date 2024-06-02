@@ -67,6 +67,15 @@ You can access the Swagger API documentation at [http://localhost:3000/api-docs]
 - **Custom Slugs:** Only admins can create custom slugs.
 - **Edit and Delete:** Only admins can edit or delete URLs.
 - **Visitor:** Visitors can create short URLs without needing to sign in.
+- **Redis Caching:**
+  ##### 1. Short URL Creation:
+  - Newly generated short URLs are cached in Redis for quick retrieval.
+  ##### 2. Click Count Tracking:
+  - Click counts for short URLs are cached in Redis, reducing database queries.
+  ##### 3. Efficiency and Freshness:
+  - Redis caching improves system performance by minimizing database queries.
+  - Cached data is regularly synced with the database via an hourly cron job.
+  - Data expires after 300 seconds, ensuring freshness and responsiveness.
 
 ### 9. Sequence Diagrams
 
@@ -273,9 +282,13 @@ URLAccessLogs
 
 1. **Slug Generation:**
 
-   - Improve the logic for creating slugs, including character restrictions and custom slugs.
+   - Currently, the system checks for the uniqueness of custom slugs. However, to improve the user experience and ensure better slug management, additional restrictions and validations can be implemented. This may include enforcing character limitations, disallowing certain patterns, or providing suggestions for available custom slugs.
 
-2. **Testing:**
+2. **Caching URL Access Logs:**
+
+   - Extend caching to store URL access logs in Redis temporarily. This can help in efficiently tracking and analyzing recent URL accesses without directly querying the database. Similar to click counts, these access logs can be periodically persisted to the database for long-term storage and analysis.
+
+3. **Testing:**
    - Develop more comprehensive test cases to ensure the robustness of the application.
 
 ---
