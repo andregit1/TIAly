@@ -4,7 +4,7 @@ require('./config/scheduler'); // Initialize scheduler
 const express = require('express');
 const bodyParser = require('body-parser');
 const session = require('express-session');
-const Redis = require('ioredis');
+const redis = require('./config/ioredis');
 const RedisStore = require('connect-redis').default;
 const db = require('./models/index');
 const passport = require('./middleware/auth');
@@ -20,7 +20,6 @@ const swaggerUi = require('swagger-ui-express');
 
 // Initialize
 const app = express();
-const redis = new Redis(process.env.REDIS_URL);
 
 redis.on('connect', function () {
   console.log('\nRedis client connected');

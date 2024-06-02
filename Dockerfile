@@ -1,6 +1,9 @@
 # Use the Node.js 20 LTS version with Alpine
 FROM node:20-alpine
 
+# Install redis-cli
+RUN apk --no-cache add redis
+
 # Create and set the working directory
 WORKDIR /app
 

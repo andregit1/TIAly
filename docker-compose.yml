@@ -17,9 +17,10 @@ services:
   redis:
     container_name: redis
     image: redis:7.2.4
-    command: redis-server
     volumes:
       - redis_data:/data
+      - ./redis.conf:/usr/local/etc/redis/redis.conf
+    command: ['redis-server', '/usr/local/etc/redis/redis.conf']
     ports:
       - '6379:6379'
     depends_on:
@@ -32,6 +33,7 @@ services:
     restart: always
     depends_on:
       - db
+    links:
       - redis
     ports:
       - '3000:3000'
