@@ -1,47 +1,75 @@
-const request = require('supertest');
-const app = require('./server'); // Import your Express app
-const { sequelize, UserTest, RoleTest, UrlTest } = require('./helper');
+const { restore } = require('sinon');
+const { 
+  sequelize,
+  assert,
+  request,
+  app,
+  Url
+} = require('./sequelize-test-setup');
 
-beforeAll(async () => {
-    await sequelize.sync();
-});
+const RedisMock = require('ioredis-mock');
+const redis = new RedisMock();
 
-afterAll(async () => {
-    await sequelize.close();
-});
+describe('URL Shortening Service', () => {
+  afterEach(async () => {
+    restore();
+    await redis.flushall(); // Clear Redis cache
+    await Url.destroy({ where: {} }); // Clear URL table
+  });
 
-describe('URL Controller', () => {
-    it('should redirect to the original URL', async () => {
-        const url = await UrlTest.create({ slug: '1a', originalUrl: 'https://www.techinasia.com/car-rental-startup-smove' });
+  describe('POST /urls/create', () => {
+    it('should create a new shortened URL with a generated slug', async () => {
+      const response = await request(app)
+        .post('/urls/create')
+        .send({ originalUrl: 'https://example.com' })
+        .expect(200);
 
-        const res = await request(app).get('/1a');
-        expect(res.status).toBe(301);
-        expect(res.header.location).toBe('https://www.techinasia.com/car-rental-startup-smove');
+      assert(response.body.slug);
+      assert.strictEqual(response.body.originalUrl, 'https://example.com');
     });
 
-    it('should return 404 for non-existing slug', async () => {
-        const res = await request(app).get('/non-existing-slug');
-        expect(res.status).toBe(404);
+    it('should create a new shortened URL with a custom slug', async () => {
+      const response = await request(app)
+        .post('/urls/create')
+        .send({ slug: 'customslug', originalUrl: 'https://example.com' })
+        .expect(200);
+
+      assert.strictEqual(response.body.slug, 'customslug');
+      assert.strictEqual(response.body.originalUrl, 'https://example.com');
+
+      const urlInDb = await Url.findOne({ where: { slug: 'customslug' } });
+      assert(urlInDb);
     });
 
-    it('should create a new URL', async () => {
-        const newUrlData = { slug: 'new-slug', originalUrl: 'https://example.com/new-page' };
-        const res = await request(app)
-            .post('/url')
-            .send(newUrlData);
+    it('should return 400 if the slug already exists', async () => {
+      await Url.create({ slug: 'customslug', originalUrl: 'https://example.com' });
 
-        expect(res.status).toBe(201);
-        expect(res.body).toHaveProperty('slug', newUrlData.slug);
-        expect(res.body).toHaveProperty('originalUrl', newUrlData.originalUrl);
+      const response = await request(app)
+        .post('/urls/create')
+        .send({ slug: 'customslug', originalUrl: 'https://example.com' })
+        .expect(400);
+
+      assert.strictEqual(response.body.message, 'Slug already exists');
+    });
+  });
+
+  describe('GET /urls/:slug', () => {
+    it('should redirect to the original URL if the slug exists', async () => {
+      const url = await Url.create({ slug: 'customslug', originalUrl: 'https://example.com' });
+
+      const response = await request(app)
+        .get(`/urls/${url.slug}`)
+        .expect(301);
+
+      assert.strictEqual(response.header.location, 'https://example.com');
     });
 
-    it('should return validation error for invalid URL', async () => {
-        const invalidUrlData = { slug: 'invalid-slug', originalUrl: 'invalid-url' };
-        const res = await request(app)
-            .post('/url')
-            .send(invalidUrlData);
+    it('should return 404 if the slug does not exist', async () => {
+      const response = await request(app)
+        .get('/urls/nonexistentslug')
+        .expect(404);
 
-        expect(res.status).toBe(400);
-        expect(res.body).toHaveProperty('error');
+      assert.strictEqual(response.text, 'URL not found');
     });
+  });
 });
