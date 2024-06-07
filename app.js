@@ -42,7 +42,10 @@ app.use(session({
 app.use(passport.initialize());
 app.use(passport.session());
 // app.use(loggingMiddleware); // Apply logging middleware
-app.use(cors()); // Use cors middleware
+// app.use(cors()); // Use cors middleware
+app.use(cors({
+  origin: 'http://localhost:3000' // Allow only this origin to access the server
+}));
 
 // Swagger setup
 const swaggerOptions = {

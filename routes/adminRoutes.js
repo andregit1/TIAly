@@ -61,7 +61,17 @@ router.get('/urls/:id', adminController.getUrl);
  *       content:
  *         application/json:
  *           schema:
- *             $ref: '#/components/schemas/Url'
+ *             type: object
+ *             properties:
+ *               slug:
+ *                 type: string
+ *                 nullable: true
+ *                 example: null
+ *                 description: The custom slug for the URL (optional)
+ *               originalUrl:
+ *                 type: string
+ *                 format: uri
+ *                 description: The original URL to be shortened
  *     responses:
  *       '201':
  *         description: URL created successfully

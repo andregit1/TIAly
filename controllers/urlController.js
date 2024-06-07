@@ -18,7 +18,7 @@ exports.redirect = async (req, res) => {
       if (url) {
         // Store in cache
         await redis.set(`url:${slug}`, JSON.stringify(url), 'EX', CACHE_EXPIRATION);
-        return res.status(404).send('URL not found');
+        // return res.status(404).send('URL not found');
       }
     }
 
